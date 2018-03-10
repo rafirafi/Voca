@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSqlDatabase>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    QSqlDatabase db_;
+    void dbOpen();
+    void dbClose();
 };
 
 #endif // MAINWINDOW_H
