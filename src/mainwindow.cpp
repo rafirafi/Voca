@@ -84,7 +84,7 @@ void MainWindow::on_pushButton_update_clicked()
 
     // if doesn't exist, insert in database
     QSqlQuery query(db_);
-    QString str = QString("insert or ignore into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
+    QString str = QString("insert into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
