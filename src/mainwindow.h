@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QSqlDatabase>
+#include <QSqlTableModel>
+#include <QCompleter>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +27,8 @@ private:
     Ui::MainWindow *ui;
 
     QSqlDatabase db_;
+    QSqlTableModel *model_ = nullptr;
+    QCompleter *completer_ = nullptr;
     void dbOpen();
     void dbClose();
 };

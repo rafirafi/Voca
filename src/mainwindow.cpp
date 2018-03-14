@@ -14,6 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     dbOpen();
+
+    model_ = new QSqlTableModel(this, db_);
+    model_->setTable("voca");
+    model_->select();
+
+    completer_ = new QCompleter(model_, this);
+    ui->lineEdit_input->setCompleter(completer_);
+    completer_->setCompletionColumn(0); // "word"
+    completer_->setCaseSensitivity(Qt::CaseInsensitive);
 }
 
 MainWindow::~MainWindow()
@@ -86,6 +95,9 @@ void MainWindow::on_pushButton_update_clicked()
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
         abort();
     }
+
+    // update model for completer
+    model_->select();
 }
 
 void MainWindow::on_pushButton_search_clicked()
