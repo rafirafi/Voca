@@ -82,9 +82,9 @@ void MainWindow::on_pushButton_update_clicked()
         return;
     }
 
-    // if doesn't exist, insert in database
+    // check if exists
     QSqlQuery query(db_);
-    QString str = QString("insert into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
+    QString str = QString("select meaning from voca where word='%1' limit 1").arg(word);
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
@@ -94,6 +94,33 @@ void MainWindow::on_pushButton_update_clicked()
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
         abort();
+    }
+    if (query.next()) {
+        // update
+        str = QString("update voca set meaning='%2' where word='%1'").arg(word).arg(meaning);
+        ok = query.prepare(str);
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+            abort();
+        }
+        ok = query.exec();
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+            abort();
+        }
+    } else {
+        // if doesn't exist, insert in database
+        str = QString("insert into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
+        ok = query.prepare(str);
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+            abort();
+        }
+        ok = query.exec();
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+            abort();
+        }
     }
 
     // update model for completer
