@@ -42,8 +42,8 @@ void MainWindow::dbOpen()
     }
 
     QSqlQuery query(db_);
-    const QString &table = "create table if not exists voca (word varchar[max], meaning varchar[max]);";
-    bool ok = query.prepare(table);
+    QString str = "create table if not exists voca (word varchar[max], meaning varchar[max]);";
+    bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << query.executedQuery();
         abort();
@@ -53,6 +53,19 @@ void MainWindow::dbOpen()
         qDebug() << query.executedQuery();
         abort();
     }
+
+    str = "create unique index if not exists idx_voca_word on voca (word);";
+    ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+
 }
 
 void MainWindow::dbClose()
@@ -82,9 +95,9 @@ void MainWindow::on_pushButton_update_clicked()
         return;
     }
 
-    // check if exists
+    // insert or replace
     QSqlQuery query(db_);
-    QString str = QString("select meaning from voca where word='%1' limit 1").arg(word);
+    QString str = QString("replace into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
@@ -94,33 +107,6 @@ void MainWindow::on_pushButton_update_clicked()
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
         abort();
-    }
-    if (query.next()) {
-        // update
-        str = QString("update voca set meaning='%2' where word='%1'").arg(word).arg(meaning);
-        ok = query.prepare(str);
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-            abort();
-        }
-        ok = query.exec();
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-            abort();
-        }
-    } else {
-        // if doesn't exist, insert in database
-        str = QString("insert into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
-        ok = query.prepare(str);
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-            abort();
-        }
-        ok = query.exec();
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-            abort();
-        }
     }
 
     // update model for completer
