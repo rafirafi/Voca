@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSaveFile>
 #include <QSqlDriver>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -145,5 +148,52 @@ void MainWindow::on_pushButton_search_clicked()
         ui->textEdit_output->setText(meaning);
     } else {
         qDebug() << Q_FUNC_INFO << "no result";
+    }
+}
+
+void MainWindow::on_actionExport_to_csv_triggered()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save File"),
+                               QDir::homePath(),
+                               tr("csv files (*.csv)"));
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    QSaveFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Export to csv failed : permission denied"));
+        msgBox.exec();
+        return;
+    }
+
+    QSqlQuery query(db_);
+    QString str = QString("select word, meaning from voca;");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+
+    while (query.next()) {
+        QString word = query.value("word").toString();
+        QString meaning = query.value("meaning").toString();
+        // TODO: quote commas... or use a csv parser lib
+        QByteArray line = word.toLocal8Bit() + ',' + meaning.toLocal8Bit() + '\n';
+        if (file.write(line) == -1) {
+            break;
+        }
+    }
+
+    if (!file.commit()) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Export to csv failed : write error"));
+        msgBox.exec();
     }
 }

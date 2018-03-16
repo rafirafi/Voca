@@ -23,6 +23,8 @@ private slots:
 
     void on_pushButton_search_clicked();
 
+    void on_actionExport_to_csv_triggered();
+
 private:
     Ui::MainWindow *ui;
 
