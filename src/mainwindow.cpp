@@ -100,12 +100,17 @@ void MainWindow::on_pushButton_update_clicked()
 
     // insert or replace
     QSqlQuery query(db_);
-    QString str = QString("replace into voca (word, meaning) values ('%1', '%2')").arg(word).arg(meaning);
+    QString str = QString("replace into voca (word, meaning) values (:word,:meaning)");
+
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
+
+    query.bindValue(":word", word);
+    query.bindValue(":meaning", meaning);
+
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
@@ -128,12 +133,16 @@ void MainWindow::on_pushButton_search_clicked()
 
     // check if exists
     QSqlQuery query(db_);
-    QString str = QString("select meaning from voca where word='%1' limit 1").arg(word);
+
+    QString str = QString("select meaning from voca where word=:word limit 1");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
+
+    query.bindValue(":word", word);
+
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
