@@ -193,8 +193,9 @@ void MainWindow::on_actionExport_to_csv_triggered()
     while (query.next()) {
         QString word = query.value("word").toString();
         QString meaning = query.value("meaning").toString();
-        // TODO: quote commas... or use a csv parser lib
-        QByteArray line = word.toLocal8Bit() + ',' + meaning.toLocal8Bit() + '\n';
+        word.replace("\t", "   ");
+        meaning.replace("\t", "   ");
+        QByteArray line = word.toLocal8Bit() + '\t' + meaning.toLocal8Bit() + '\n';
         if (file.write(line) == -1) {
             break;
         }

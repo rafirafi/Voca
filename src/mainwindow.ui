@@ -84,7 +84,7 @@
   </action>
   <action name="actionExport_to_csv">
    <property name="text">
-    <string>Export to csv</string>
+    <string>Export to tab separated csv</string>
    </property>
   </action>
  </widget>
