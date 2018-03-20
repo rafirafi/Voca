@@ -197,6 +197,8 @@ void MainWindow::on_actionExport_to_csv_triggered()
         QString meaning = query.value("meaning").toString();
         word.replace("\t", "   ");
         meaning.replace("\t", "   ");
+        word.replace("\n","<br/>");
+        meaning.replace("\n","<br/>");
         QByteArray line = word.toLocal8Bit() + '\t' + meaning.toLocal8Bit() + '\n';
         if (file.write(line) == -1) {
             break;
