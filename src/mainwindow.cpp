@@ -26,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_input->setCompleter(completer_);
     completer_->setCompletionColumn(0); // "word"
     completer_->setCaseSensitivity(Qt::CaseInsensitive);
+
+    on_zoomGroupAction_triggered(ui->actionZoom_In);
 }
 
 MainWindow::~MainWindow()
@@ -206,4 +208,26 @@ void MainWindow::on_actionExport_to_csv_triggered()
         msgBox.setText(tr("Export to csv failed : write error"));
         msgBox.exec();
     }
+}
+
+void MainWindow::on_zoomGroupAction_triggered(QAction *action)
+{
+    QFont font = ui->centralWidget->font();
+    int pointSize = font.pointSize();
+    if (action == ui->actionNormal_Size) {
+        int appPointSize = qApp->font().pointSize();
+        if (pointSize == appPointSize) {
+            return;
+        }
+        pointSize = appPointSize;
+    } else {
+        if (action == ui->actionZoom_In) {
+            pointSize += 2;
+        } else if (action == ui->actionZoom_Out) {
+            pointSize -= 2;
+        }
+    }
+    font.setPointSize(pointSize);
+    ui->centralWidget->setFont(font);
+    completer_->popup()->setFont(font);
 }

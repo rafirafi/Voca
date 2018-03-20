@@ -25,6 +25,7 @@ private slots:
 
     void on_actionExport_to_csv_triggered();
 
+    void on_zoomGroupAction_triggered(QAction *action);
 private:
     Ui::MainWindow *ui;
 
