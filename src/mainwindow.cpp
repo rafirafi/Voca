@@ -236,3 +236,68 @@ void MainWindow::on_zoomGroupAction_triggered(QAction *action)
     ui->centralWidget->setFont(font);
     completer_->popup()->setFont(font);
 }
+
+void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
+                               QDir::homePath(),
+                               tr("csv files (*.csv)"));
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Import from csv failed : permission denied"));
+        msgBox.exec();
+        return;
+    }
+
+    QSqlQuery query(db_);
+    QString str = QString("replace into voca (word, meaning) values (:word,:meaning)");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+
+    int importCnt = 0, lineCnt = 0;
+
+    char buf[4096];
+    while (file.readLine(buf, sizeof(buf)) != -1) {
+        lineCnt++;
+
+        QString line(buf);
+        line.replace("<br/>", "\n");
+        QStringList words = line.split('\t');
+        if (words.size() != 2) {
+            continue;
+        }
+        words[0] = words[0].trimmed();
+        words[1] = words[1].trimmed();
+        if (words[0].isEmpty() || words[1].isEmpty()) {
+            continue;
+        }
+
+        words[0].toLower();
+
+        query.bindValue(":word", words[0]);
+        query.bindValue(":meaning", words[1]);
+        ok = query.exec();
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+            abort();
+        }
+
+        importCnt++;
+    }
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Import from csv : imported %1/%2 data").arg(importCnt).arg(lineCnt));
+    msgBox.exec();
+
+    if (importCnt) {
+        model_->select(); // update model for completer
+    }
+}

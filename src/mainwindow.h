@@ -20,12 +20,11 @@ public:
 
 private slots:
     void on_pushButton_update_clicked();
-
-    void on_pushButton_search_clicked();
-
+    void on_pushButton_search_clicked();    
     void on_actionExport_to_csv_triggered();
-
     void on_zoomGroupAction_triggered(QAction *action);
+    void on_actionImport_from_tab_separated_csv_triggered();
+
 private:
     Ui::MainWindow *ui;
 
