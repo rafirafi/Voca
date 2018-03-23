@@ -28,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     completer_->setCaseSensitivity(Qt::CaseInsensitive);
 
     on_zoomGroupAction_triggered(ui->actionZoom_In);
+
+    QObject::connect(completer_, SIGNAL(activated(QString)),
+                     this, SLOT(on_pushButton_search_clicked()));
 }
 
 MainWindow::~MainWindow()
