@@ -79,6 +79,8 @@
     <addaction name="actionExport_to_csv"/>
     <addaction name="actionImport_from_tab_separated_csv"/>
     <addaction name="separator"/>
+    <addaction name="actionDelete_everything"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -150,6 +152,11 @@
   <action name="actionImport_from_tab_separated_csv">
    <property name="text">
     <string>Import from tab separated csv</string>
+   </property>
+  </action>
+  <action name="actionDelete_everything">
+   <property name="text">
+    <string>Delete everything</string>
    </property>
   </action>
  </widget>

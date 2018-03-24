@@ -25,6 +25,8 @@ private slots:
     void on_zoomGroupAction_triggered(QAction *action);
     void on_actionImport_from_tab_separated_csv_triggered();
 
+    void on_actionDelete_everything_triggered();
+
 private:
     Ui::MainWindow *ui;
 

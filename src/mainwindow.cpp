@@ -73,7 +73,6 @@ void MainWindow::dbOpen()
         qDebug() << query.executedQuery();
         abort();
     }
-
 }
 
 void MainWindow::dbClose()
@@ -300,4 +299,25 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
     if (importCnt) {
         model_->select(); // update model for completer
     }
+}
+
+void MainWindow::on_actionDelete_everything_triggered()
+{
+    ui->lineEdit_input->clear();
+    ui->textEdit_output->clear();
+
+    QSqlQuery query(db_);
+    QString str = QString("delete from voca");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+
+    model_->select();
 }
