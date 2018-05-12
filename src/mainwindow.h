@@ -27,6 +27,8 @@ private slots:
 
     void on_actionDelete_everything_triggered();
 
+    void on_actionExport_as_apkg_triggered();
+
 private:
     Ui::MainWindow *ui;
 

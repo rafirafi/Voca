@@ -76,6 +76,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionExport_as_apkg"/>
     <addaction name="actionExport_to_csv"/>
     <addaction name="actionImport_from_tab_separated_csv"/>
     <addaction name="separator"/>
@@ -157,6 +158,11 @@
   <action name="actionDelete_everything">
    <property name="text">
     <string>Delete everything</string>
+   </property>
+  </action>
+  <action name="actionExport_as_apkg">
+   <property name="text">
+    <string>Export as apkg</string>
    </property>
   </action>
  </widget>

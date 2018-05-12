@@ -2,11 +2,16 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QSaveFile>
 #include <QSqlDriver>
 #include <QSqlQuery>
 #include <QSqlError>
+
+#ifdef SUPPORT_APKG
+#include "ankipackage.h"
+#endif
 
 #include <QtDebug>
 
@@ -31,6 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(completer_, SIGNAL(activated(QString)),
                      this, SLOT(on_pushButton_search_clicked()));
+
+#ifndef SUPPORT_APKG
+    ui->actionExport_as_apkg->setVisible(false);
+#endif
+
 }
 
 MainWindow::~MainWindow()
@@ -320,4 +330,58 @@ void MainWindow::on_actionDelete_everything_triggered()
     }
 
     model_->select();
+}
+
+void MainWindow::on_actionExport_as_apkg_triggered()
+{
+#ifdef SUPPORT_APKG
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As .apkg "),
+                               QDir::homePath(),
+                               tr("apkg files (*.apkg)"));
+    if (fileName.endsWith(".apkg")) {
+        fileName.remove(-5, 5);
+    }
+    if (fileName.isEmpty()) {
+        return;
+    }
+    auto offset = fileName.lastIndexOf(QDir::separator());
+    QString filePath = fileName.left(offset);
+    QString baseName = fileName.mid(offset + 1);
+    if (baseName.isEmpty()) {
+        return;
+    }
+
+    QString deckName;
+    QMessageBox msgBox;
+    msgBox.setText(QObject::tr("Specifying a deck name ?"));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    if (msgBox.exec() ==  QMessageBox::Ok) {
+        deckName = QInputDialog::getText(this, tr("Deck name"), tr("Deck Name :"), QLineEdit::Normal);
+    }
+
+    AnkiPackage apkg{deckName};
+    QSqlQuery query(db_);
+    query.setForwardOnly(true);
+    QString str = QString("select word, meaning from voca;");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+
+    while (query.next()) {
+        QString word = query.value("word").toString();
+        QString meaning = query.value("meaning").toString();
+        word.replace("\n","<br/>");
+        meaning.replace("\n","<br/>");
+        apkg.addBasicCard(word, meaning);
+    }
+
+    apkg.exportAsApkg(filePath, baseName);
+#endif
 }
