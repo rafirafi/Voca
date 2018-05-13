@@ -1,13 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMessageBox>
 #include <QSaveFile>
 #include <QSqlDriver>
 #include <QSqlQuery>
 #include <QSqlError>
+
 
 #ifdef SUPPORT_APKG
 #include "ankipackage.h"
@@ -384,4 +387,24 @@ void MainWindow::on_actionExport_as_apkg_triggered()
 
     apkg.exportAsApkg(filePath, baseName);
 #endif
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QDialog dia;
+    dia.setWindowTitle(tr("About ") + qApp->applicationName());
+
+    auto butBox = new QDialogButtonBox(QDialogButtonBox::Close, &dia);
+    butBox->button(QDialogButtonBox::Close)->setIcon(QIcon::fromTheme("cancel"));
+    connect(butBox, &QDialogButtonBox::clicked, &dia, &QDialog::close);
+
+    auto text = new QLabel(&dia);
+    text->setAlignment(Qt::AlignCenter);
+    text->setText(tr("Copyright © 2018 rafirafi\n\nLicense AGPL v3\n"));
+
+    dia.setLayout(new QVBoxLayout(&dia));
+    dia.layout()->addWidget(text);
+    dia.layout()->addWidget(butBox);
+
+    dia.exec();
 }

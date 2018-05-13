@@ -29,6 +29,8 @@ private slots:
 
     void on_actionExport_as_apkg_triggered();
 
+    void on_actionAbout_triggered();
+
 private:
     Ui::MainWindow *ui;
 

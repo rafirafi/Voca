@@ -92,8 +92,15 @@
     <addaction name="actionZoom_Out"/>
     <addaction name="actionNormal_Size"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionQuit">
    <property name="text">
@@ -163,6 +170,15 @@
   <action name="actionExport_as_apkg">
    <property name="text">
     <string>Export as apkg</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="help-about">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
