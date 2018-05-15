@@ -10,7 +10,7 @@
 #include <QSqlDriver>
 #include <QSqlQuery>
 #include <QSqlError>
-
+#include <QStandardPaths>
 
 #ifdef SUPPORT_APKG
 #include "ankipackage.h"
@@ -56,7 +56,19 @@ MainWindow::~MainWindow()
 void MainWindow::dbOpen()
 {
     db_ = QSqlDatabase::addDatabase("QSQLITE", "vocadb");
-    db_.setDatabaseName("vocadb.sqlite");
+
+    QString dbLoc = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (dbLoc.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << "no writable location";
+        abort();
+    }
+    if (!QFileInfo::exists(dbLoc) && !QDir().mkpath(dbLoc)) {
+        qDebug() << Q_FUNC_INFO << "not possible to create writable location";
+        abort();
+    }
+    qDebug() << dbLoc;
+
+    db_.setDatabaseName(dbLoc + QDir::separator() + "vocadb.sqlite");
     if (!db_.open()) {
         qDebug() << Q_FUNC_INFO << "db open failed";
         abort();
