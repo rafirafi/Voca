@@ -30,3 +30,6 @@ contains(DEFINES, SUPPORT_APKG) {
     QT += KArchive
 }
 
+DISTFILES += \
+    LICENSE
+
