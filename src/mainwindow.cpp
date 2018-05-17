@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <cassert>
+
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -78,7 +80,7 @@ void MainWindow::dbOpen()
     }
 
     QSqlQuery query(db_);
-    QString str = "create table if not exists voca (word varchar[max], meaning varchar[max]);";
+    QString str = "create table if not exists voca (word text, meaning text, deckid integer);";
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << query.executedQuery();
@@ -101,6 +103,21 @@ void MainWindow::dbOpen()
         qDebug() << query.executedQuery();
         abort();
     }
+
+    str = "create table if not exists decks (id integer primary key autoincrement, name text not null unique);";
+    ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+
+    // start on default deck
+    setCurrentDeck("Default");
 }
 
 void MainWindow::dbClose()
@@ -110,6 +127,53 @@ void MainWindow::dbClose()
     } else {
         qDebug() << Q_FUNC_INFO << "db was not open";
         abort();
+    }
+}
+
+void MainWindow::addDeck(const QString &deckName)
+{
+    assert(!deckName.isEmpty());
+
+    QSqlQuery query(db_);
+    QString str = "insert or ignore into decks (name) values (:name);";
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+    query.bindValue(":name", deckName);
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << query.executedQuery();
+        abort();
+    }
+}
+
+void MainWindow::setCurrentDeck(const QString &deckName)
+{
+    QSqlQuery query(db_);
+    QString str = QString("select id from decks where name=:name limit 1");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    query.bindValue(":name", deckName);
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+    static bool retry;
+    if (query.next()) {
+        currentDeckId_ = query.value("id").toInt();
+        assert(currentDeckId_ != -1);
+        retry = false;
+    } else {
+        assert(!retry);
+        retry = true;
+        addDeck(deckName);
+        setCurrentDeck(deckName);
     }
 }
 
@@ -132,7 +196,7 @@ void MainWindow::on_pushButton_update_clicked()
 
     // insert or replace
     QSqlQuery query(db_);
-    QString str = QString("replace into voca (word, meaning) values (:word,:meaning)");
+    QString str = QString("replace into voca (word, meaning, deckid) values (:word,:meaning,:deckid)");
 
     bool ok = query.prepare(str);
     if (!ok) {
@@ -142,6 +206,7 @@ void MainWindow::on_pushButton_update_clicked()
 
     query.bindValue(":word", word);
     query.bindValue(":meaning", meaning);
+    query.bindValue(":deckid", currentDeckId_);
 
     ok = query.exec();
     if (!ok) {
@@ -265,7 +330,7 @@ void MainWindow::on_zoomGroupAction_triggered(QAction *action)
 }
 
 void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
-{
+{    
     QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
                                QDir::homePath(),
                                tr("csv files (*.csv)"));
@@ -282,7 +347,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
     }
 
     QSqlQuery query(db_);
-    QString str = QString("replace into voca (word, meaning) values (:word,:meaning)");
+    QString str = QString("replace into voca (word, meaning, deckid) values (:word,:meaning,:deckid)");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
@@ -311,6 +376,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
 
         query.bindValue(":word", words[0]);
         query.bindValue(":meaning", words[1]);
+        query.bindValue(":deckid", currentDeckId_);
         ok = query.exec();
         if (!ok) {
             qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
