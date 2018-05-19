@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionExport_as_apkg->setVisible(false);
 #endif
 
+    // start on default deck
+    setCurrentDeck("Default");
 }
 
 MainWindow::~MainWindow()
@@ -116,8 +118,6 @@ void MainWindow::dbOpen()
         abort();
     }
 
-    // start on default deck
-    setCurrentDeck("Default");
 }
 
 void MainWindow::dbClose()
@@ -169,6 +169,11 @@ void MainWindow::setCurrentDeck(const QString &deckName)
         currentDeckId_ = query.value("id").toInt();
         assert(currentDeckId_ != -1);
         retry = false;
+
+        // set then apply filter
+        assert(model_);
+        model_->setFilter(QString("deckid='%1'").arg(currentDeckId_));
+        model_->select();
     } else {
         assert(!retry);
         retry = true;
@@ -231,7 +236,7 @@ void MainWindow::on_pushButton_search_clicked()
     // check if exists
     QSqlQuery query(db_);
 
-    QString str = QString("select meaning from voca where word=:word limit 1");
+    QString str = QString("select meaning from voca where word=:word and deckid=:deckid limit 1");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
@@ -239,6 +244,7 @@ void MainWindow::on_pushButton_search_clicked()
     }
 
     query.bindValue(":word", word);
+    query.bindValue(":deckid", currentDeckId_);
 
     ok = query.exec();
     if (!ok) {
@@ -257,6 +263,7 @@ void MainWindow::on_pushButton_search_clicked()
     }
 }
 
+// export current deck only
 void MainWindow::on_actionExport_to_csv_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save File"),
@@ -275,12 +282,13 @@ void MainWindow::on_actionExport_to_csv_triggered()
     }
 
     QSqlQuery query(db_);
-    QString str = QString("select word, meaning from voca;");
+    QString str = QString("select word, meaning from voca where deckid=:deckid;");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
+    query.bindValue(":deckid", currentDeckId_);
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
@@ -401,12 +409,13 @@ void MainWindow::on_actionDelete_everything_triggered()
     ui->textEdit_output->clear();
 
     QSqlQuery query(db_);
-    QString str = QString("delete from voca");
+    QString str = QString("delete from voca where deckid=:deckid;");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
+    query.bindValue(":deckid", currentDeckId_);
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
@@ -446,12 +455,13 @@ void MainWindow::on_actionExport_as_apkg_triggered()
     AnkiPackage apkg{deckName};
     QSqlQuery query(db_);
     query.setForwardOnly(true);
-    QString str = QString("select word, meaning from voca;");
+    QString str = QString("select word, meaning from voca where deckid=:deckid;");
     bool ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
+    query.bindValue(":deckid", currentDeckId_);
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
