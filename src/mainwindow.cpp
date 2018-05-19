@@ -174,6 +174,8 @@ void MainWindow::setCurrentDeck(const QString &deckName)
         assert(model_);
         model_->setFilter(QString("deckid='%1'").arg(currentDeckId_));
         model_->select();
+
+        ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckName));
     } else {
         assert(!retry);
         retry = true;
