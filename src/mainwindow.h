@@ -8,6 +8,7 @@
 #include <QSqlDatabase>
 #include <QSqlTableModel>
 #include <QCompleter>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -27,7 +28,7 @@ private slots:
     void on_actionExport_to_csv_triggered();
     void on_zoomGroupAction_triggered(QAction *action);
     void on_actionImport_from_tab_separated_csv_triggered();
-    void on_actionDelete_everything_triggered();
+    void on_actionDelete_current_deck_triggered();
     void on_actionExport_as_apkg_triggered();
     void on_actionAbout_triggered();
 
@@ -40,7 +41,6 @@ private:
     int currentDeckId_ = -1;
     void dbOpen();
     void dbClose();
-
     void addDeck(const QString &deckName);
     void setCurrentDeck(const QString &deckName);
 };

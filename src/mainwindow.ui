@@ -91,7 +91,7 @@
     <addaction name="actionExport_to_csv"/>
     <addaction name="actionImport_from_tab_separated_csv"/>
     <addaction name="separator"/>
-    <addaction name="actionDelete_everything"/>
+    <addaction name="actionDelete_current_deck"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -173,9 +173,9 @@
     <string>Import from tab separated csv</string>
    </property>
   </action>
-  <action name="actionDelete_everything">
+  <action name="actionDelete_current_deck">
    <property name="text">
-    <string>Delete everything</string>
+    <string>Delete current deck</string>
    </property>
   </action>
   <action name="actionExport_as_apkg">

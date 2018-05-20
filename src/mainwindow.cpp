@@ -23,6 +23,11 @@
 
 #include <QtDebug>
 
+static inline const QString defaultDeckName()
+{
+    return QObject::tr("Default");
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -50,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     // start on default deck
-    setCurrentDeck("Default");
+    setCurrentDeck(defaultDeckName());
 }
 
 MainWindow::~MainWindow()
@@ -405,7 +410,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
     }
 }
 
-void MainWindow::on_actionDelete_everything_triggered()
+void MainWindow::on_actionDelete_current_deck_triggered()
 {
     ui->lineEdit_input->clear();
     ui->textEdit_output->clear();
@@ -424,7 +429,22 @@ void MainWindow::on_actionDelete_everything_triggered()
         abort();
     }
 
-    model_->select();
+    // remove current Deck
+    str = QString("delete from decks where id=:deckid;");
+    ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    query.bindValue(":deckid", currentDeckId_);
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+
+    //  go to 'Default' deck
+    setCurrentDeck(defaultDeckName());
 }
 
 void MainWindow::on_actionExport_as_apkg_triggered()
