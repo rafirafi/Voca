@@ -219,5 +219,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEdit_input</sender>
+   <signal>returnPressed()</signal>
+   <receiver>pushButton_search</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>67</x>
+     <y>107</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
