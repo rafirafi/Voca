@@ -410,11 +410,10 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
     }
 }
 
-void MainWindow::on_actionDelete_current_deck_triggered()
+// delete deck with deckId, deckId must exist, the caller is responsible for ui coherence
+void MainWindow::deleteDeck(int deckId)
 {
-    ui->lineEdit_input->clear();
-    ui->textEdit_output->clear();
-
+    // remove deck content
     QSqlQuery query(db_);
     QString str = QString("delete from voca where deckid=:deckid;");
     bool ok = query.prepare(str);
@@ -422,26 +421,34 @@ void MainWindow::on_actionDelete_current_deck_triggered()
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
-    query.bindValue(":deckid", currentDeckId_);
+    query.bindValue(":deckid", deckId);
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
         abort();
     }
 
-    // remove current Deck
+    // remove deck itself
     str = QString("delete from decks where id=:deckid;");
     ok = query.prepare(str);
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
         abort();
     }
-    query.bindValue(":deckid", currentDeckId_);
+    query.bindValue(":deckid", deckId);
     ok = query.exec();
     if (!ok) {
         qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
         abort();
     }
+}
+
+void MainWindow::on_actionDelete_current_deck_triggered()
+{
+    ui->lineEdit_input->clear();
+    ui->textEdit_output->clear();
+
+    deleteDeck(currentDeckId_);
 
     //  go to 'Default' deck
     setCurrentDeck(defaultDeckName());

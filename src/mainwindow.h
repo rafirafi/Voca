@@ -42,7 +42,8 @@ private:
     void dbOpen();
     void dbClose();
     void addDeck(const QString &deckName);
-    void setCurrentDeck(const QString &deckName);
+    void setCurrentDeck(const QString &deckName);    
+    void deleteDeck(int deckId);
 };
 
 #endif // MAINWINDOW_H
