@@ -443,6 +443,28 @@ void MainWindow::deleteDeck(int deckId)
     }
 }
 
+// returns -1 if no deck is named deckName
+int MainWindow::getDeckId(const QString &deckName)
+{
+    QSqlQuery query(db_);
+    QString str = QString("select id from decks where name=:deckName;");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    query.bindValue(":deckName", deckName);
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+    if (query.next()) {
+        return query.value("id").toInt();
+    }
+    return -1;
+}
+
 void MainWindow::on_actionDelete_current_deck_triggered()
 {
     ui->lineEdit_input->clear();
