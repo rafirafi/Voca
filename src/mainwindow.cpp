@@ -550,3 +550,69 @@ void MainWindow::on_actionAbout_triggered()
 
     dia.exec();
 }
+
+// deckOldName deck must exists and deckNewName can't be empty
+void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewName)
+{
+    qDebug() << __func__ << "deckNewName" << deckNewName << "deckOldName" << deckOldName;
+    // check params validity
+    assert(!deckNewName.isEmpty());
+    int deckId = getDeckId(deckOldName);
+    assert(deckId != -1);
+
+    // nothing to do
+    if (deckNewName == deckOldName) {
+        return;
+    }
+
+    // check case new name already exists
+    int newDeckId = getDeckId(deckNewName);
+    if (newDeckId != -1) {
+        // ask user if ok before deleting deck
+        QMessageBox msgBox(this);
+        msgBox.setText(QObject::tr("Deck %1 already exists, ok for deleting it ?").arg(deckNewName));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        if (msgBox.exec() ==  QMessageBox::Cancel) {
+            qDebug() << __func__ << "no to overwrite";
+            return;
+        }
+        deleteDeck(newDeckId);
+        if (newDeckId == currentDeckId_) {
+            currentDeckId_ = -1;
+        }
+    }
+
+    // do the renaming
+    {
+        QSqlQuery query(db_);
+        QString str = QString("update decks set name=:name where id=:id");
+
+        bool ok = query.prepare(str);
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+            abort();
+        }
+
+        query.bindValue(":name", deckNewName);
+        query.bindValue(":id", deckId);
+
+        ok = query.exec();
+        if (!ok) {
+            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+            abort();
+        }
+    }
+
+    // if old name was default, recreate it
+    if (deckOldName == defaultDeckName()) {
+        addDeck(defaultDeckName());
+    }
+
+    // make sure to get a current deck
+    if (currentDeckId_ == -1) {
+        currentDeckId_ = getDeckId(defaultDeckName());
+        ui->label_current_deck_name->setText(defaultDeckName());
+    } else if (currentDeckId_ == deckId) { // if current deck was renamed
+        ui->label_current_deck_name->setText(deckNewName);
+    }
+}

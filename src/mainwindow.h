@@ -44,8 +44,8 @@ private:
     void addDeck(const QString &deckName);
     void setCurrentDeck(const QString &deckName);    
     void deleteDeck(int deckId);
-
     int getDeckId(const QString &deckName);
+    void renameDeck(const QString &deckOldName, const QString &deckNewName);
 };
 
 #endif // MAINWINDOW_H
