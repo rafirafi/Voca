@@ -632,9 +632,9 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
     // make sure to get a current deck
     if (currentDeckId_ == -1) {
         currentDeckId_ = getDeckId(defaultDeckName());
-        ui->label_current_deck_name->setText(defaultDeckName());
+        ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(defaultDeckName()));
     } else if (currentDeckId_ == deckId) { // if current deck was renamed
-        ui->label_current_deck_name->setText(deckNewName);
+        ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckNewName));
     }
 }
 
