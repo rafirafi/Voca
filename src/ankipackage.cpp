@@ -295,16 +295,19 @@ void AnkiPackage::addBasicCard(const QString &front, const QString &back)
     }
 }
 
-void AnkiPackage::exportAsApkg(const QString &filePath, const QString &baseName)
+void AnkiPackage::exportAsApkg(const QString &filePath, const QString &baseName, bool askOverwrite)
 {
+    assert(!baseName.isEmpty());
     QString filename = QString("%1%2%3.apkg").arg(filePath).arg(QDir::separator()).arg(baseName);
     if (QFileInfo::exists(filename)) {
-        QMessageBox msgBox;
-        msgBox.setText(QObject::tr("Overwriting existing apkg ?"));
-        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-        if (msgBox.exec() ==  QMessageBox::Cancel) {
-            qDebug() << __func__ << "don't overwrite";
-            return;
+        if (askOverwrite) {
+            QMessageBox msgBox;
+            msgBox.setText(QObject::tr("Overwriting existing apkg ?"));
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+            if (msgBox.exec() ==  QMessageBox::Cancel) {
+                qDebug() << __func__ << "don't overwrite";
+                return;
+            }
         }
         if (!QFile::remove(filename)) {
             qDebug() << __func__ << "failed to remove existing file";

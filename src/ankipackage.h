@@ -18,7 +18,7 @@ public:
     ~AnkiPackage();
 
     void addBasicCard(const QString &front, const QString &back);
-    void exportAsApkg(const QString &filePath, const QString &baseName = "");
+    void exportAsApkg(const QString &filePath, const QString &baseName, bool askOverwrite = false);
 
 private:
     QString deckName_;
