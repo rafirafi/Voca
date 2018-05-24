@@ -465,6 +465,27 @@ int MainWindow::getDeckId(const QString &deckName)
     return -1;
 }
 
+QString MainWindow::getDeckName(int deckId)
+{
+    QSqlQuery query(db_);
+    QString str = QString("select name from decks where id=:deckId;");
+    bool ok = query.prepare(str);
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
+        abort();
+    }
+    query.bindValue(":deckId", deckId);
+    ok = query.exec();
+    if (!ok) {
+        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
+        abort();
+    }
+    if (query.next()) {
+        return query.value("name").toString();
+    }
+    return QString();
+}
+
 void MainWindow::on_actionDelete_current_deck_triggered()
 {
     ui->lineEdit_input->clear();
@@ -615,4 +636,18 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
     } else if (currentDeckId_ == deckId) { // if current deck was renamed
         ui->label_current_deck_name->setText(deckNewName);
     }
+}
+
+void MainWindow::on_actionRename_current_deck_triggered()
+{
+    QString deckOldName = getDeckName(currentDeckId_);
+    assert(!deckOldName.isEmpty());
+    QString deckNewName = QInputDialog::getText(this,
+                                                tr("Rename Deck"),
+                                                tr("Deck name : %1").arg(deckOldName),
+                                                QLineEdit::Normal);
+    if (deckNewName.isEmpty()) {
+        return;
+    }
+    renameDeck(deckOldName, deckNewName);
 }

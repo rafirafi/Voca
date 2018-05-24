@@ -92,6 +92,7 @@
     <addaction name="actionImport_from_tab_separated_csv"/>
     <addaction name="separator"/>
     <addaction name="actionDelete_current_deck"/>
+    <addaction name="actionRename_current_deck"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -190,6 +191,11 @@
    </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionRename_current_deck">
+   <property name="text">
+    <string>Rename current deck</string>
    </property>
   </action>
  </widget>
