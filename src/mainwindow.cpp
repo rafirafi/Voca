@@ -498,8 +498,8 @@ void MainWindow::on_actionExport_as_apkg_triggered()
     QString deckName;
     QMessageBox msgBox(this);
     msgBox.setText(QObject::tr("Specifying a deck name ?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    if (msgBox.exec() ==  QMessageBox::Ok) {
+    msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    if (msgBox.exec() ==  QMessageBox::Yes) {
         deckName = QInputDialog::getText(this, tr("Deck name"), tr("Deck Name :"), QLineEdit::Normal);
     }
 
