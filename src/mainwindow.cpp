@@ -282,7 +282,7 @@ void MainWindow::on_actionExport_to_csv_triggered()
 
     QSaveFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox msgBox;
+        QMessageBox msgBox(this);
         msgBox.setText(tr("Export to csv failed : permission denied"));
         msgBox.exec();
         return;
@@ -316,7 +316,7 @@ void MainWindow::on_actionExport_to_csv_triggered()
     }
 
     if (!file.commit()) {
-        QMessageBox msgBox;
+        QMessageBox msgBox(this);
         msgBox.setText(tr("Export to csv failed : write error"));
         msgBox.exec();
     }
@@ -355,7 +355,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox msgBox;
+        QMessageBox msgBox(this);
         msgBox.setText(tr("Import from csv failed : permission denied"));
         msgBox.exec();
         return;
@@ -401,7 +401,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
         importCnt++;
     }
 
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     msgBox.setText(tr("Import from csv : imported %1/%2 data").arg(importCnt).arg(lineCnt));
     msgBox.exec();
 
@@ -496,7 +496,7 @@ void MainWindow::on_actionExport_as_apkg_triggered()
     }
 
     QString deckName;
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     msgBox.setText(QObject::tr("Specifying a deck name ?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     if (msgBox.exec() ==  QMessageBox::Ok) {
