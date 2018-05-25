@@ -33,6 +33,8 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionRename_current_deck_triggered();
 
+    void on_actionShow_Deck_Name_triggered();
+
 private:
     Ui::MainWindow *ui;
 

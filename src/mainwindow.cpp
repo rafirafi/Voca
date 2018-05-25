@@ -651,3 +651,9 @@ void MainWindow::on_actionRename_current_deck_triggered()
     }
     renameDeck(deckOldName, deckNewName);
 }
+
+void MainWindow::on_actionShow_Deck_Name_triggered()
+{
+    bool visible = ui->actionShow_Deck_Name->isChecked();
+    ui->label_current_deck_name->setVisible(visible);
+}
