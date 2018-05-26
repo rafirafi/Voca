@@ -94,6 +94,7 @@
     <addaction name="actionDelete_current_deck"/>
     <addaction name="actionRename_current_deck"/>
     <addaction name="actionCreate_current_deck"/>
+    <addaction name="actionChoose_current_deck"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -215,6 +216,11 @@
   <action name="actionCreate_current_deck">
    <property name="text">
     <string>Create current deck</string>
+   </property>
+  </action>
+  <action name="actionChoose_current_deck">
+   <property name="text">
+    <string>Choose current deck</string>
    </property>
   </action>
  </widget>

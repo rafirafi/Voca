@@ -10,12 +10,14 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
+#include <QListView>
 #include <QMessageBox>
 #include <QSaveFile>
 #include <QSqlDriver>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QStandardPaths>
+
 
 #ifdef SUPPORT_APKG
 #include "ankipackage.h"
@@ -680,4 +682,45 @@ void MainWindow::on_actionCreate_current_deck_triggered()
         deleteDeck(deckId);
     }
     setCurrentDeck(deckNewName);
+}
+
+void MainWindow::on_actionChoose_current_deck_triggered()
+{
+    QDialog dia(this);
+    dia.setWindowTitle(tr("Choose current deck"));
+    dia.setLayout(new QVBoxLayout(&dia));
+
+    QSqlTableModel *model = new QSqlTableModel(&dia, db_);
+    model->setTable("decks");
+    model->select();
+
+    QListView *view = new QListView(&dia);
+    view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    view->setModel(model);
+    view->setModelColumn(1); // deck name column
+
+    dia.layout()->addWidget(view);
+    auto butBox = new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Ok, &dia);
+    butBox->button(QDialogButtonBox::Close)->setIcon(QIcon::fromTheme("cancel"));
+    connect(butBox, &QDialogButtonBox::rejected , &dia, &QDialog::close);
+    butBox->button(QDialogButtonBox::Ok)->setIcon(QIcon::fromTheme("accept"));
+    connect(butBox, &QDialogButtonBox::accepted , &dia, &QDialog::accept);
+    dia.layout()->addWidget(butBox);
+    if (dia.exec() == QDialog::Rejected) {
+        return;
+    }
+    auto modelIndexList = view->selectionModel()->selectedIndexes();
+    if (modelIndexList.isEmpty()) {
+        return;
+    }
+    assert(modelIndexList.size() == 1);
+    QString deckName = modelIndexList[0].data(Qt::DisplayRole).toString();
+    int deckId = getDeckId(deckName);
+    assert(deckId != -1);
+    if (deckId == currentDeckId_) {
+        return;
+    }
+    ui->lineEdit_input->clear();
+    ui->textEdit_output->clear();
+    setCurrentDeck(deckName);
 }
