@@ -93,6 +93,7 @@
     <addaction name="separator"/>
     <addaction name="actionDelete_current_deck"/>
     <addaction name="actionRename_current_deck"/>
+    <addaction name="actionCreate_current_deck"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -209,6 +210,11 @@
    </property>
    <property name="text">
     <string>Show Deck Name</string>
+   </property>
+  </action>
+  <action name="actionCreate_current_deck">
+   <property name="text">
+    <string>Create current deck</string>
    </property>
   </action>
  </widget>

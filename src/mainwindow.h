@@ -32,8 +32,8 @@ private slots:
     void on_actionExport_as_apkg_triggered();
     void on_actionAbout_triggered();
     void on_actionRename_current_deck_triggered();
-
     void on_actionShow_Deck_Name_triggered();
+    void on_actionCreate_current_deck_triggered();
 
 private:
     Ui::MainWindow *ui;

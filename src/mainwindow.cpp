@@ -657,3 +657,27 @@ void MainWindow::on_actionShow_Deck_Name_triggered()
     bool visible = ui->actionShow_Deck_Name->isChecked();
     ui->label_current_deck_name->setVisible(visible);
 }
+
+void MainWindow::on_actionCreate_current_deck_triggered()
+{
+    QString deckNewName = QInputDialog::getText(this,
+                                                tr("Create Deck"),
+                                                "Deck name :",
+                                                QLineEdit::Normal);
+    qDebug() << "name" << deckNewName;
+    if (deckNewName.isEmpty()) {
+        return;
+    }
+    int deckId = getDeckId(deckNewName);
+    qDebug() << "id" << deckId;
+    if (deckId != -1) {
+        QMessageBox msgBox(this);
+        msgBox.setText(QObject::tr("Deck %1 already exists, ok for overwriting it ?").arg(deckNewName));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        if (msgBox.exec() ==  QMessageBox::No) {
+            return on_actionCreate_current_deck_triggered();
+        }
+        deleteDeck(deckId);
+    }
+    setCurrentDeck(deckNewName);
+}
