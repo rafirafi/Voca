@@ -91,11 +91,6 @@
     <addaction name="actionExport_to_csv"/>
     <addaction name="actionImport_from_tab_separated_csv"/>
     <addaction name="separator"/>
-    <addaction name="actionDelete_current_deck"/>
-    <addaction name="actionRename_current_deck"/>
-    <addaction name="actionCreate_current_deck"/>
-    <addaction name="actionChoose_current_deck"/>
-    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -114,7 +109,17 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionDelete_current_deck"/>
+    <addaction name="actionRename_current_deck"/>
+    <addaction name="actionCreate_current_deck"/>
+    <addaction name="actionChoose_current_deck"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
