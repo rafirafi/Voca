@@ -681,6 +681,8 @@ void MainWindow::on_actionCreate_current_deck_triggered()
         }
         deleteDeck(deckId);
     }
+    ui->lineEdit_input->clear();
+    ui->textEdit_output->clear();
     setCurrentDeck(deckNewName);
 }
 
