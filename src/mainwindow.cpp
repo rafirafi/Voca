@@ -230,6 +230,9 @@ void MainWindow::on_pushButton_update_clicked()
 
     // update model for completer
     model_->select();
+
+    // update ui
+    ui->label_current_word_name->setText(tr("Word : %1").arg(word));
 }
 
 void MainWindow::on_pushButton_search_clicked()
@@ -263,10 +266,12 @@ void MainWindow::on_pushButton_search_clicked()
 
     // display meaning if any
     ui->textEdit_output->clear();
+    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
     if (query.next()) {
         QString meaning = query.value("meaning").toString();
         qDebug() << Q_FUNC_INFO << "result" << meaning;
         ui->textEdit_output->setText(meaning);
+        ui->label_current_word_name->setText(tr("Word : %1").arg(word));
     } else {
         qDebug() << Q_FUNC_INFO << "no result";
     }
@@ -492,6 +497,7 @@ void MainWindow::on_actionDelete_current_deck_triggered()
 {
     ui->lineEdit_input->clear();
     ui->textEdit_output->clear();
+    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
 
     deleteDeck(currentDeckId_);
 
@@ -683,6 +689,8 @@ void MainWindow::on_actionCreate_current_deck_triggered()
     }
     ui->lineEdit_input->clear();
     ui->textEdit_output->clear();
+    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
+
     setCurrentDeck(deckNewName);
 }
 
@@ -724,5 +732,7 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     }
     ui->lineEdit_input->clear();
     ui->textEdit_output->clear();
+    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
+
     setCurrentDeck(deckName);
 }

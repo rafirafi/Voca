@@ -18,7 +18,14 @@
     <item>
      <widget class="QLabel" name="label_current_deck_name">
       <property name="text">
-       <string>deck name</string>
+       <string>Deck :</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_current_word_name">
+      <property name="text">
+       <string>Word :</string>
       </property>
      </widget>
     </item>
@@ -98,6 +105,7 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_Deck_Name"/>
+    <addaction name="actionShow_Current_Word"/>
     <addaction name="separator"/>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
@@ -228,6 +236,17 @@
     <string>Choose current deck</string>
    </property>
   </action>
+  <action name="actionShow_Current_Word">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Current Word</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -268,6 +287,22 @@
     <hint type="destinationlabel">
      <x>67</x>
      <y>107</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShow_Current_Word</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_current_word_name</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>67</y>
     </hint>
    </hints>
   </connection>
