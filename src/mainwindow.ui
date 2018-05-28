@@ -306,5 +306,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionShow_Deck_Name</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_current_deck_name</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
