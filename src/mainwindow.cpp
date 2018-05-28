@@ -518,9 +518,9 @@ void MainWindow::on_actionExport_as_apkg_triggered()
         return;
     }
 
-    QString deckName;
+    QString deckName = getDeckName(currentDeckId_);
     QMessageBox msgBox(this);
-    msgBox.setText(QObject::tr("Specifying a deck name ?"));
+    msgBox.setText(QObject::tr("Changing deck name, current : %1 ?").arg(deckName));
     msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
     if (msgBox.exec() ==  QMessageBox::Yes) {
         deckName = QInputDialog::getText(this, tr("Deck name"), tr("Deck Name :"), QLineEdit::Normal);
