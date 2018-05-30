@@ -302,7 +302,7 @@ void AnkiPackage::exportAsApkg(const QString &filePath, const QString &baseName,
     if (QFileInfo::exists(filename)) {
         if (askOverwrite) {
             QMessageBox msgBox;
-            msgBox.setText(QObject::tr("Overwriting existing apkg ?"));
+            msgBox.setText(AnkiPackage::tr("Overwriting existing apkg ?"));
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             if (msgBox.exec() ==  QMessageBox::Cancel) {
                 qDebug() << __func__ << "don't overwrite";

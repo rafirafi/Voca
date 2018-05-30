@@ -6,6 +6,7 @@
 
 #include <cstdint>
 
+#include <QCoreApplication>
 #include <QSqlDatabase>
 #include <QString>
 #include <QTemporaryDir>
@@ -13,6 +14,7 @@
 //NOTE(rafi) : no error path, will abort if pb
 class AnkiPackage
 {
+    Q_DECLARE_TR_FUNCTIONS(AnkiPackage)
 public:
     explicit AnkiPackage(const QString &deckName = "");
     ~AnkiPackage();

@@ -13,7 +13,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ../vocabulary
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         mainwindow.cpp
 
@@ -30,6 +29,9 @@ contains(DEFINES, SUPPORT_APKG) {
     QT += KArchive
 }
 
-DISTFILES += \
-    LICENSE
+TRANSLATIONS += languages/fr_FR.ts
 
+DISTFILES += LICENSE \
+    languages/fr_FR.ts
+
+RESOURCES += resources.qrc

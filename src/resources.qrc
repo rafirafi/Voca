@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ts" lang="fr">
+        <file alias="ts.qm">languages/fr_FR.qm</file>
+    </qresource>
+</RCC>

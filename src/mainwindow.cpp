@@ -27,7 +27,7 @@
 
 static inline const QString defaultDeckName()
 {
-    return QObject::tr("Default");
+    return MainWindow::tr("Default");
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -280,6 +280,7 @@ void MainWindow::on_pushButton_search_clicked()
 // export current deck only
 void MainWindow::on_actionExport_to_csv_triggered()
 {
+
     QString filename = QFileDialog::getSaveFileName(this, tr("Save File"),
                                QDir::homePath(),
                                tr("csv files (*.csv)"));
@@ -526,7 +527,7 @@ void MainWindow::on_actionExport_as_apkg_triggered()
 
     QString deckName = getDeckName(currentDeckId_);
     QMessageBox msgBox(this);
-    msgBox.setText(QObject::tr("Changing deck name, current : %1 ?").arg(deckName));
+    msgBox.setText(tr("Changing deck name, current : %1 ?").arg(deckName));
     msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
     if (msgBox.exec() ==  QMessageBox::Yes) {
         deckName = QInputDialog::getText(this, tr("Deck name"), tr("Deck Name :"), QLineEdit::Normal);
@@ -599,7 +600,7 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
     if (newDeckId != -1) {
         // ask user if ok before deleting deck
         QMessageBox msgBox(this);
-        msgBox.setText(QObject::tr("Deck %1 already exists, ok for deleting it ?").arg(deckNewName));
+        msgBox.setText(tr("Deck %1 already exists, ok for deleting it ?").arg(deckNewName));
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         if (msgBox.exec() ==  QMessageBox::Cancel) {
             qDebug() << __func__ << "no to overwrite";
@@ -664,7 +665,7 @@ void MainWindow::on_actionCreate_current_deck_triggered()
 {
     QString deckNewName = QInputDialog::getText(this,
                                                 tr("Create Deck"),
-                                                "Deck name :",
+                                                tr("Deck name :"),
                                                 QLineEdit::Normal);
     qDebug() << "name" << deckNewName;
     if (deckNewName.isEmpty()) {
@@ -674,7 +675,7 @@ void MainWindow::on_actionCreate_current_deck_triggered()
     qDebug() << "id" << deckId;
     if (deckId != -1) {
         QMessageBox msgBox(this);
-        msgBox.setText(QObject::tr("Deck %1 already exists, ok for overwriting it ?").arg(deckNewName));
+        msgBox.setText(tr("Deck %1 already exists, ok for overwriting it ?").arg(deckNewName));
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (msgBox.exec() ==  QMessageBox::No) {
             return on_actionCreate_current_deck_triggered();
