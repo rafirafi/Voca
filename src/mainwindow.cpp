@@ -737,7 +737,6 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     auto butBox = new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Ok, &dia);
     butBox->button(QDialogButtonBox::Close)->setIcon(QIcon::fromTheme("cancel"));
     connect(butBox, &QDialogButtonBox::rejected , &dia, &QDialog::close);
-    butBox->button(QDialogButtonBox::Ok)->setIcon(QIcon::fromTheme("accept"));
     connect(butBox, &QDialogButtonBox::accepted , &dia, &QDialog::accept);
     dia.layout()->addWidget(butBox);
     if (dia.exec() == QDialog::Rejected) {
