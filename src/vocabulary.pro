@@ -14,9 +14,11 @@ TARGET = ../vocabulary
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    preferences.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    preferences.h
 
 FORMS    += mainwindow.ui
 
