@@ -10,6 +10,8 @@
 #include <QCompleter>
 #include <QString>
 
+#include "preferences.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -34,6 +36,8 @@ private slots:
     void on_actionRename_current_deck_triggered();
     void on_actionCreate_current_deck_triggered();
     void on_actionChoose_current_deck_triggered();
+    void on_actionShow_Deck_Name_toggled(bool isChecked);
+    void on_actionShow_Current_Word_toggled(bool isChecked);
 
 private:
     Ui::MainWindow *ui;
@@ -45,11 +49,15 @@ private:
     void dbOpen();
     void dbClose();
     void addDeck(const QString &deckName);
-    void setCurrentDeck(const QString &deckName);
+    void setCurrentDeck(const QString &deckName, bool create = true);
     void deleteDeck(int deckId);
     int getDeckId(const QString &deckName);
     QString getDeckName(int deckId);
     void renameDeck(const QString &deckOldName, const QString &deckNewName);
+    bool setFontSize(int pointSize);
+    void setCurrentDeckId(int deckId);
+
+    Preferences prefs_;
 };
 
 #endif // MAINWINDOW_H

@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    prefs_.init();
+
     dbOpen();
 
     model_ = new QSqlTableModel(this, db_);
@@ -47,17 +49,26 @@ MainWindow::MainWindow(QWidget *parent) :
     completer_->setCompletionColumn(0); // "word"
     completer_->setCaseSensitivity(Qt::CaseInsensitive);
 
-    on_zoomGroupAction_triggered(ui->actionZoom_In);
-
     QObject::connect(completer_, SIGNAL(activated(QString)),
                      this, SLOT(on_pushButton_search_clicked()));
+
+    setFontSize(prefs_.getProperty("last-font-size").toInt());
 
 #ifndef SUPPORT_APKG
     ui->actionExport_as_apkg->setVisible(false);
 #endif
 
-    // start on default deck
-    setCurrentDeck(defaultDeckName());
+    // start on last deck or default
+    QString deckName = prefs_.getProperty("last-deck-name").toString();
+    if (!deckName.isEmpty()) {
+        setCurrentDeck(deckName, false);
+    }
+    if (currentDeckId_ == -1) {
+        setCurrentDeck(defaultDeckName());
+    }
+
+    ui->actionShow_Deck_Name->setChecked(prefs_.getProperty("show-current-deck-name").toBool());
+    ui->actionShow_Current_Word->setChecked(prefs_.getProperty("show-last-word-found").toBool());
 }
 
 MainWindow::~MainWindow()
@@ -80,7 +91,7 @@ void MainWindow::dbOpen()
         qDebug() << Q_FUNC_INFO << "not possible to create writable location";
         abort();
     }
-    qDebug() << dbLoc;
+    qDebug() << "database file at" << dbLoc;
 
     db_.setDatabaseName(dbLoc + QDir::separator() + "vocadb.sqlite");
     if (!db_.open()) {
@@ -156,7 +167,7 @@ void MainWindow::addDeck(const QString &deckName)
     }
 }
 
-void MainWindow::setCurrentDeck(const QString &deckName)
+void MainWindow::setCurrentDeck(const QString &deckName, bool create)
 {
     QSqlQuery query(db_);
     QString str = QString("select id from decks where name=:name limit 1");
@@ -173,7 +184,7 @@ void MainWindow::setCurrentDeck(const QString &deckName)
     }
     static bool retry;
     if (query.next()) {
-        currentDeckId_ = query.value("id").toInt();
+        setCurrentDeckId(query.value("id").toInt());
         assert(currentDeckId_ != -1);
         retry = false;
 
@@ -183,7 +194,7 @@ void MainWindow::setCurrentDeck(const QString &deckName)
         model_->select();
 
         ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckName));
-    } else {
+    } else if (create) {
         assert(!retry);
         retry = true;
         addDeck(deckName);
@@ -332,8 +343,7 @@ void MainWindow::on_actionExport_to_csv_triggered()
 
 void MainWindow::on_zoomGroupAction_triggered(QAction *action)
 {
-    QFont font = ui->centralWidget->font();
-    int pointSize = font.pointSize();
+    int pointSize = ui->centralWidget->font().pointSize();
     if (action == ui->actionNormal_Size) {
         int appPointSize = qApp->font().pointSize();
         if (pointSize == appPointSize) {
@@ -347,9 +357,8 @@ void MainWindow::on_zoomGroupAction_triggered(QAction *action)
             pointSize -= 2;
         }
     }
-    font.setPointSize(pointSize);
-    ui->centralWidget->setFont(font);
-    completer_->popup()->setFont(font);
+    prefs_.setProperty("last-font-size", pointSize);
+    setFontSize(pointSize);
 }
 
 void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
@@ -608,7 +617,7 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
         }
         deleteDeck(newDeckId);
         if (newDeckId == currentDeckId_) {
-            currentDeckId_ = -1;
+            setCurrentDeckId(-1);
         }
     }
 
@@ -640,11 +649,31 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
 
     // make sure to get a current deck
     if (currentDeckId_ == -1) {
-        currentDeckId_ = getDeckId(defaultDeckName());
         ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(defaultDeckName()));
     } else if (currentDeckId_ == deckId) { // if current deck was renamed
         ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckNewName));
     }
+
+    // to record new name in preferences
+    setCurrentDeckId(currentDeckId_);
+}
+
+bool MainWindow::setFontSize(int pointSize)
+{
+    if (pointSize <= 0) {
+        return false;
+    }
+    QFont font = ui->centralWidget->font();
+    font.setPointSize(pointSize);
+    ui->centralWidget->setFont(font);
+    completer_->popup()->setFont(font);
+    return true;
+}
+
+void MainWindow::setCurrentDeckId(int deckId)
+{
+    currentDeckId_ = deckId;
+    prefs_.setProperty("last-deck-name", getDeckName(deckId));
 }
 
 void MainWindow::on_actionRename_current_deck_triggered()
@@ -730,4 +759,14 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     ui->label_current_word_name->setText(tr("Word : %1").arg(""));
 
     setCurrentDeck(deckName);
+}
+
+void MainWindow::on_actionShow_Deck_Name_toggled(bool isChecked)
+{
+    prefs_.setProperty("show-current-deck-name", isChecked);
+}
+
+void MainWindow::on_actionShow_Current_Word_toggled(bool isChecked)
+{
+    prefs_.setProperty("show-last-word-found", isChecked);
 }
