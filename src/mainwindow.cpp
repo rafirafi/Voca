@@ -505,11 +505,9 @@ QString MainWindow::getDeckName(int deckId)
 
 void MainWindow::on_actionDelete_current_deck_triggered()
 {
-    ui->lineEdit_input->clear();
-    ui->textEdit_output->clear();
-    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
-
     deleteDeck(currentDeckId_);
+
+    clearCurrentWord();
 
     //  go to 'Default' deck
     setCurrentDeck(defaultDeckName());
@@ -676,6 +674,13 @@ void MainWindow::setCurrentDeckId(int deckId)
     prefs_.setProperty("last-deck-name", getDeckName(deckId));
 }
 
+void MainWindow::clearCurrentWord()
+{
+    ui->lineEdit_input->clear();
+    ui->textEdit_output->clear();
+    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
+}
+
 void MainWindow::on_actionRename_current_deck_triggered()
 {
     QString deckOldName = getDeckName(currentDeckId_);
@@ -711,9 +716,8 @@ void MainWindow::on_actionCreate_current_deck_triggered()
         }
         deleteDeck(deckId);
     }
-    ui->lineEdit_input->clear();
-    ui->textEdit_output->clear();
-    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
+
+    clearCurrentWord();
 
     setCurrentDeck(deckNewName);
 }
@@ -753,9 +757,8 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     if (deckId == currentDeckId_) {
         return;
     }
-    ui->lineEdit_input->clear();
-    ui->textEdit_output->clear();
-    ui->label_current_word_name->setText(tr("Word : %1").arg(""));
+
+    clearCurrentWord();
 
     setCurrentDeck(deckName);
 }

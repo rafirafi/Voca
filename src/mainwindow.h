@@ -56,6 +56,7 @@ private:
     void renameDeck(const QString &deckOldName, const QString &deckNewName);
     bool setFontSize(int pointSize);
     void setCurrentDeckId(int deckId);
+    void clearCurrentWord();
 
     Preferences prefs_;
 };
