@@ -1,3 +1,6 @@
+// Copyright : 2018 rafirafi
+// License : GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
