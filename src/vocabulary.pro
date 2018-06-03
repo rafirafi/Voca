@@ -15,10 +15,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    preferences.cpp
+    preferences.cpp \
+    collection.cpp
 
 HEADERS  += mainwindow.h \
-    preferences.h
+    preferences.h \
+    collection.h
 
 FORMS    += mainwindow.ui
 
