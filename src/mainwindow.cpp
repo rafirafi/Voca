@@ -18,7 +18,6 @@
 #include <QSqlError>
 #include <QStandardPaths>
 
-
 #ifdef SUPPORT_APKG
 #include "ankipackage.h"
 #endif
@@ -38,9 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     prefs_.init();
 
-    dbOpen();
-
-    model_ = new QSqlTableModel(this, db_);
+    model_ = new QSqlTableModel(this, *col_.db());
     model_->setTable("voca");
     model_->select();
 
@@ -73,133 +70,30 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    dbClose();
-
+    delete model_; // silence QSqlDatabasePrivate::removeDatabase: connection is still in use
     delete ui;
-}
-
-void MainWindow::dbOpen()
-{
-    db_ = QSqlDatabase::addDatabase("QSQLITE", "vocadb");
-
-    QString dbLoc = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (dbLoc.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << "no writable location";
-        abort();
-    }
-    if (!QFileInfo::exists(dbLoc) && !QDir().mkpath(dbLoc)) {
-        qDebug() << Q_FUNC_INFO << "not possible to create writable location";
-        abort();
-    }
-    qDebug() << "database file at" << dbLoc;
-
-    db_.setDatabaseName(dbLoc + QDir::separator() + "vocadb.sqlite");
-    if (!db_.open()) {
-        qDebug() << Q_FUNC_INFO << "db open failed";
-        abort();
-    }
-
-    QSqlQuery query(db_);
-    QString str = "create table if not exists voca (word text, meaning text, deckid integer);";
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-
-    str = "create unique index if not exists idx_voca_word on voca (word);";
-    ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-
-    str = "create table if not exists decks (id integer primary key autoincrement, name text not null unique);";
-    ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-
-}
-
-void MainWindow::dbClose()
-{
-    if (db_.isOpen()) {
-        db_.close();
-    } else {
-        qDebug() << Q_FUNC_INFO << "db was not open";
-        abort();
-    }
-}
-
-void MainWindow::addDeck(const QString &deckName)
-{
-    assert(!deckName.isEmpty());
-
-    QSqlQuery query(db_);
-    QString str = "insert or ignore into decks (name) values (:name);";
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":name", deckName);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << query.executedQuery();
-        abort();
-    }
 }
 
 void MainWindow::setCurrentDeck(const QString &deckName, bool create)
 {
-    QSqlQuery query(db_);
-    QString str = QString("select id from decks where name=:name limit 1");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
+    int id = col_.getDeckId(deckName);
+    if (id == -1) {
+        if (!create) {
+            return;
+        }
+        col_.addDeck(deckName);
+        id = col_.getDeckId(deckName);
     }
-    query.bindValue(":name", deckName);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-    static bool retry;
-    if (query.next()) {
-        setCurrentDeckId(query.value("id").toInt());
-        assert(currentDeckId_ != -1);
-        retry = false;
+    assert(id != -1);
 
-        // set then apply filter
-        assert(model_);
-        model_->setFilter(QString("deckid='%1'").arg(currentDeckId_));
-        model_->select();
+    setCurrentDeckId(id);
 
-        ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckName));
-    } else if (create) {
-        assert(!retry);
-        retry = true;
-        addDeck(deckName);
-        setCurrentDeck(deckName);
-    }
+    // set then apply filter
+    assert(model_);
+    model_->setFilter(QString("deckid='%1'").arg(currentDeckId_));
+    model_->select();
+
+    ui->label_current_deck_name->setText(QString(tr("Deck : %1")).arg(deckName));
 }
 
 void MainWindow::on_pushButton_update_clicked()
@@ -219,25 +113,7 @@ void MainWindow::on_pushButton_update_clicked()
         return;
     }
 
-    // insert or replace
-    QSqlQuery query(db_);
-    QString str = QString("replace into voca (word, meaning, deckid) values (:word,:meaning,:deckid)");
-
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-
-    query.bindValue(":word", word);
-    query.bindValue(":meaning", meaning);
-    query.bindValue(":deckid", currentDeckId_);
-
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
+    col_.upsertWord(currentDeckId_, word, meaning);
 
     // update model for completer
     model_->select();
@@ -256,30 +132,12 @@ void MainWindow::on_pushButton_search_clicked()
     }
     word = word.toLower();
 
-    // check if exists
-    QSqlQuery query(db_);
-
-    QString str = QString("select meaning from voca where word=:word and deckid=:deckid limit 1");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-
-    query.bindValue(":word", word);
-    query.bindValue(":deckid", currentDeckId_);
-
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-
     // display meaning if any
     ui->textEdit_output->clear();
     ui->label_current_word_name->setText(tr("Word : %1").arg(""));
-    if (query.next()) {
-        QString meaning = query.value("meaning").toString();
+
+    QString meaning = col_.getMeaning(currentDeckId_, word);
+    if (!meaning.isEmpty()) {
         qDebug() << Q_FUNC_INFO << "result" << meaning;
         ui->textEdit_output->setText(meaning);
         ui->label_current_word_name->setText(tr("Word : %1").arg(word));
@@ -307,23 +165,10 @@ void MainWindow::on_actionExport_to_csv_triggered()
         return;
     }
 
-    QSqlQuery query(db_);
-    QString str = QString("select word, meaning from voca where deckid=:deckid;");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckid", currentDeckId_);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-
-    while (query.next()) {
-        QString word = query.value("word").toString();
-        QString meaning = query.value("meaning").toString();
+    DeckContent content = col_.getDeckContent(currentDeckId_);
+    QString word, meaning;
+    while (!content.isEmpty()) {
+        content.getNext(word, meaning);
         word.replace("\t", "   ");
         meaning.replace("\t", "   ");
         word.replace("\n","<br/>");
@@ -378,14 +223,6 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
         return;
     }
 
-    QSqlQuery query(db_);
-    QString str = QString("replace into voca (word, meaning, deckid) values (:word,:meaning,:deckid)");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-
     int importCnt = 0, lineCnt = 0;
 
     char buf[4096];
@@ -403,17 +240,9 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
         if (words[0].isEmpty() || words[1].isEmpty()) {
             continue;
         }
-
         words[0].toLower();
 
-        query.bindValue(":word", words[0]);
-        query.bindValue(":meaning", words[1]);
-        query.bindValue(":deckid", currentDeckId_);
-        ok = query.exec();
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-            abort();
-        }
+        col_.upsertWord(currentDeckId_, words[0], words[1]);
 
         importCnt++;
     }
@@ -427,85 +256,9 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
     }
 }
 
-// delete deck with deckId, deckId must exist, the caller is responsible for ui coherence
-void MainWindow::deleteDeck(int deckId)
-{
-    // remove deck content
-    QSqlQuery query(db_);
-    QString str = QString("delete from voca where deckid=:deckid;");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckid", deckId);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-
-    // remove deck itself
-    str = QString("delete from decks where id=:deckid;");
-    ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckid", deckId);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-}
-
-// returns -1 if no deck is named deckName
-int MainWindow::getDeckId(const QString &deckName)
-{
-    QSqlQuery query(db_);
-    QString str = QString("select id from decks where name=:deckName;");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckName", deckName);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-    if (query.next()) {
-        return query.value("id").toInt();
-    }
-    return -1;
-}
-
-QString MainWindow::getDeckName(int deckId)
-{
-    QSqlQuery query(db_);
-    QString str = QString("select name from decks where id=:deckId;");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckId", deckId);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
-    if (query.next()) {
-        return query.value("name").toString();
-    }
-    return QString();
-}
-
 void MainWindow::on_actionDelete_current_deck_triggered()
 {
-    deleteDeck(currentDeckId_);
+    col_.deleteDeck(currentDeckId_);
 
     clearCurrentWord();
 
@@ -532,7 +285,7 @@ void MainWindow::on_actionExport_as_apkg_triggered()
         return;
     }
 
-    QString deckName = getDeckName(currentDeckId_);
+    QString deckName = col_.getDeckName(currentDeckId_);
     QMessageBox msgBox(this);
     msgBox.setText(tr("Changing deck name, current : %1 ?").arg(deckName));
     msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
@@ -541,24 +294,11 @@ void MainWindow::on_actionExport_as_apkg_triggered()
     }
 
     AnkiPackage apkg{deckName};
-    QSqlQuery query(db_);
-    query.setForwardOnly(true);
-    QString str = QString("select word, meaning from voca where deckid=:deckid;");
-    bool ok = query.prepare(str);
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-        abort();
-    }
-    query.bindValue(":deckid", currentDeckId_);
-    ok = query.exec();
-    if (!ok) {
-        qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-        abort();
-    }
 
-    while (query.next()) {
-        QString word = query.value("word").toString();
-        QString meaning = query.value("meaning").toString();
+    DeckContent content = col_.getDeckContent(currentDeckId_);
+    QString word, meaning;
+    while (!content.isEmpty()) {
+        content.getNext(word, meaning);
         word.replace("\n","<br/>");
         meaning.replace("\n","<br/>");
         apkg.addBasicCard(word, meaning);
@@ -594,7 +334,7 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
     qDebug() << __func__ << "deckNewName" << deckNewName << "deckOldName" << deckOldName;
     // check params validity
     assert(!deckNewName.isEmpty());
-    int deckId = getDeckId(deckOldName);
+    int deckId = col_.getDeckId(deckOldName);
     assert(deckId != -1);
 
     // nothing to do
@@ -603,7 +343,7 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
     }
 
     // check case new name already exists
-    int newDeckId = getDeckId(deckNewName);
+    int newDeckId = col_.getDeckId(deckNewName);
     if (newDeckId != -1) {
         // ask user if ok before deleting deck
         QMessageBox msgBox(this);
@@ -613,36 +353,18 @@ void MainWindow::renameDeck(const QString &deckOldName, const QString &deckNewNa
             qDebug() << __func__ << "no to overwrite";
             return;
         }
-        deleteDeck(newDeckId);
+        col_.deleteDeck(newDeckId);
         if (newDeckId == currentDeckId_) {
             setCurrentDeckId(-1);
         }
     }
 
     // do the renaming
-    {
-        QSqlQuery query(db_);
-        QString str = QString("update decks set name=:name where id=:id");
-
-        bool ok = query.prepare(str);
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "prepare" << query.executedQuery();
-            abort();
-        }
-
-        query.bindValue(":name", deckNewName);
-        query.bindValue(":id", deckId);
-
-        ok = query.exec();
-        if (!ok) {
-            qDebug() << Q_FUNC_INFO << "exec" <<  query.executedQuery();
-            abort();
-        }
-    }
+    col_.renameDeck(deckId, deckNewName);
 
     // if old name was default, recreate it
     if (deckOldName == defaultDeckName()) {
-        addDeck(defaultDeckName());
+        col_.addDeck(defaultDeckName());
     }
 
     // make sure to get a current deck
@@ -671,7 +393,7 @@ bool MainWindow::setFontSize(int pointSize)
 void MainWindow::setCurrentDeckId(int deckId)
 {
     currentDeckId_ = deckId;
-    prefs_.setProperty("last-deck-name", getDeckName(deckId));
+    prefs_.setProperty("last-deck-name", col_.getDeckName(deckId));
 }
 
 void MainWindow::clearCurrentWord()
@@ -683,7 +405,7 @@ void MainWindow::clearCurrentWord()
 
 void MainWindow::on_actionRename_current_deck_triggered()
 {
-    QString deckOldName = getDeckName(currentDeckId_);
+    QString deckOldName = col_.getDeckName(currentDeckId_);
     assert(!deckOldName.isEmpty());
     QString deckNewName = QInputDialog::getText(this,
                                                 tr("Rename Deck"),
@@ -705,7 +427,7 @@ void MainWindow::on_actionCreate_current_deck_triggered()
     if (deckNewName.isEmpty()) {
         return;
     }
-    int deckId = getDeckId(deckNewName);
+    int deckId = col_.getDeckId(deckNewName);
     qDebug() << "id" << deckId;
     if (deckId != -1) {
         QMessageBox msgBox(this);
@@ -714,7 +436,7 @@ void MainWindow::on_actionCreate_current_deck_triggered()
         if (msgBox.exec() ==  QMessageBox::No) {
             return on_actionCreate_current_deck_triggered();
         }
-        deleteDeck(deckId);
+        col_.deleteDeck(deckId);
     }
 
     clearCurrentWord();
@@ -728,7 +450,7 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     dia.setWindowTitle(tr("Choose current deck"));
     dia.setLayout(new QVBoxLayout(&dia));
 
-    QSqlTableModel *model = new QSqlTableModel(&dia, db_);
+    QSqlTableModel *model = new QSqlTableModel(&dia, *col_.db());
     model->setTable("decks");
     model->select();
 
@@ -752,7 +474,7 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     }
     assert(modelIndexList.size() == 1);
     QString deckName = modelIndexList[0].data(Qt::DisplayRole).toString();
-    int deckId = getDeckId(deckName);
+    int deckId = col_.getDeckId(deckName);
     assert(deckId != -1);
     if (deckId == currentDeckId_) {
         return;

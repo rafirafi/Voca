@@ -10,6 +10,7 @@
 #include <QCompleter>
 #include <QString>
 
+#include "collection.h"
 #include "preferences.h"
 
 namespace Ui {
@@ -42,17 +43,13 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QSqlDatabase db_;
+    Collection col_;
     QSqlTableModel *model_ = nullptr;
     QCompleter *completer_ = nullptr;
+
     int currentDeckId_ = -1;
-    void dbOpen();
-    void dbClose();
-    void addDeck(const QString &deckName);
+
     void setCurrentDeck(const QString &deckName, bool create = true);
-    void deleteDeck(int deckId);
-    int getDeckId(const QString &deckName);
-    QString getDeckName(int deckId);
     void renameDeck(const QString &deckOldName, const QString &deckNewName);
     bool setFontSize(int pointSize);
     void setCurrentDeckId(int deckId);
