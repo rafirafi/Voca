@@ -310,7 +310,7 @@ void MainWindow::on_actionExport_as_apkg_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QDialog dia;
+    QDialog dia(this);
     dia.setWindowTitle(tr("About ") + qApp->applicationName());
 
     auto butBox = new QDialogButtonBox(QDialogButtonBox::Close, &dia);
