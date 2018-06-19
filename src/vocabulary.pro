@@ -44,7 +44,8 @@ TRANSLATIONS += languages/fr_FR.ts
 }
 
 DISTFILES += LICENSE \
-    languages/fr_FR.ts
+    languages/fr_FR.ts \
+    ../README.md
 
 RESOURCES += resources.qrc
 
