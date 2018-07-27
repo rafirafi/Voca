@@ -240,7 +240,7 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
         if (words[0].isEmpty() || words[1].isEmpty()) {
             continue;
         }
-        words[0].toLower();
+        words[0] = words[0].toLower();
 
         col_.upsertWord(currentDeckId_, words[0], words[1]);
 
