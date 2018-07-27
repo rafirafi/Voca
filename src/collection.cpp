@@ -25,7 +25,12 @@ void Collection::dbOpen()
 {
     db_ = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", "vocadb"));
 
-    QString dbLoc = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#if QT_VERSION < 0x050400
+	auto dataLocation = QStandardPaths::DataLocation;
+#else 
+	auto dataLocation = QStandardPaths::AppDataLocation;
+#endif
+    QString dbLoc = QStandardPaths::writableLocation(dataLocation);
     if (dbLoc.isEmpty()) {
         qDebug() << Q_FUNC_INFO << "no writable location";
         abort();
