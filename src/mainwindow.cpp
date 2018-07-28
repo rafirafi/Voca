@@ -149,15 +149,15 @@ void MainWindow::on_pushButton_search_clicked()
 // export current deck only
 void MainWindow::on_actionExport_to_csv_triggered()
 {
-
-    QString filename = QFileDialog::getSaveFileName(this, tr("Save File"),
-                               QDir::homePath(),
+    QString fileName = QDir::homePath() + "/" + col_.getDeckName(currentDeckId_) + ".csv";
+    fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                               fileName,
                                tr("csv files (*.csv)"));
-    if (filename.isEmpty()) {
+    if (fileName.isEmpty()) {
         return;
     }
 
-    QSaveFile file(filename);
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox msgBox(this);
         msgBox.setText(tr("Export to csv failed : permission denied"));
@@ -208,14 +208,14 @@ void MainWindow::on_zoomGroupAction_triggered(QAction *action)
 
 void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
 {    
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open File"),
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
                                QDir::homePath(),
                                tr("csv files (*.csv)"));
-    if (filename.isEmpty()) {
+    if (fileName.isEmpty()) {
         return;
     }
 
-    QFile file(filename);
+    QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox msgBox(this);
         msgBox.setText(tr("Import from csv failed : permission denied"));
@@ -269,8 +269,9 @@ void MainWindow::on_actionDelete_current_deck_triggered()
 void MainWindow::on_actionExport_as_apkg_triggered()
 {
 #ifdef SUPPORT_APKG
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As .apkg "),
-                               QDir::homePath(),
+    QString fileName = QDir::homePath() + "/" + col_.getDeckName(currentDeckId_) + ".apkg";
+    fileName = QFileDialog::getSaveFileName(this, tr("Save File As .apkg "),
+                               fileName,
                                tr("apkg files (*.apkg)"));
     if (fileName.endsWith(".apkg")) {
         fileName.remove(-5, 5);
