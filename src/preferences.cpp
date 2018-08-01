@@ -28,6 +28,8 @@ void Preferences::init()
     defaultData_.insert("last-deck-name", {QVariant::String, ""}); // invalid
     defaultData_.insert("show-current-deck-name", {QVariant::Bool, true});
     defaultData_.insert("show-last-word-found", {QVariant::Bool, true});
+    defaultData_.insert("last-import-directory", {QVariant::String, QDir::homePath()});
+    defaultData_.insert("last-export-directory", {QVariant::String, QDir::homePath()});
 
     // set data to default
     data_ = defaultData_;

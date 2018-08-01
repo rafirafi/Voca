@@ -25,7 +25,7 @@ public:
 
     void init();
     QVariant getProperty(const QString &propertyName, bool getDefault = false);
-    void resetProperty(const QString &propertyName, bool doEmit = true);
+    void resetProperty(const QString &propertyName, bool doEmit = false);
     void setProperty(const QString &propertyName, const QVariant &propertyValue, bool doEmit = false);
 
 signals:

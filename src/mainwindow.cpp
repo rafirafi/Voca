@@ -149,7 +149,14 @@ void MainWindow::on_pushButton_search_clicked()
 // export current deck only
 void MainWindow::on_actionExport_to_csv_triggered()
 {
-    QString fileName = QDir::homePath() + "/" + col_.getDeckName(currentDeckId_) + ".csv";
+    QString dir = prefs_.getProperty("last-export-directory").toString();
+    QFileInfo info(dir);
+    if (!info.exists() || !info.isDir() || !info.isWritable()) {
+        prefs_.resetProperty("last-export-directory");
+        dir = prefs_.getProperty("last-export-directory").toString();
+    }
+
+    QString fileName = dir + "/" + col_.getDeckName(currentDeckId_) + ".csv";
     fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                                fileName,
                                tr("csv files (*.csv)"));
@@ -163,6 +170,11 @@ void MainWindow::on_actionExport_to_csv_triggered()
         msgBox.setText(tr("Export to csv failed : permission denied"));
         msgBox.exec();
         return;
+    }
+
+    QString ndir = QFileInfo(fileName).absolutePath();
+    if (ndir != dir) {
+        prefs_.setProperty("last-export-directory", ndir);
     }
 
     DeckContent content = col_.getDeckContent(currentDeckId_);
@@ -207,9 +219,16 @@ void MainWindow::on_zoomGroupAction_triggered(QAction *action)
 }
 
 void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
-{    
+{
+    QString dir = prefs_.getProperty("last-import-directory").toString();
+    QFileInfo info(dir);
+    if (!info.exists() || !info.isDir() || !info.isReadable()) {
+        prefs_.resetProperty("last-import-directory");
+        dir = prefs_.getProperty("last-import-directory").toString();
+    }
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                               QDir::homePath(),
+                               dir,
                                tr("csv files (*.csv)"));
     if (fileName.isEmpty()) {
         return;
@@ -221,6 +240,11 @@ void MainWindow::on_actionImport_from_tab_separated_csv_triggered()
         msgBox.setText(tr("Import from csv failed : permission denied"));
         msgBox.exec();
         return;
+    }
+
+    QString ndir = QFileInfo(fileName).absolutePath();
+    if (ndir != dir) {
+        prefs_.setProperty("last-import-directory", ndir);
     }
 
     int importCnt = 0, lineCnt = 0;
@@ -269,7 +293,14 @@ void MainWindow::on_actionDelete_current_deck_triggered()
 void MainWindow::on_actionExport_as_apkg_triggered()
 {
 #ifdef SUPPORT_APKG
-    QString fileName = QDir::homePath() + "/" + col_.getDeckName(currentDeckId_) + ".apkg";
+    QString dir = prefs_.getProperty("last-export-directory").toString();
+    QFileInfo info(dir);
+    if (!info.exists() || !info.isDir() || !info.isWritable()) {
+        prefs_.resetProperty("last-export-directory");
+        dir = prefs_.getProperty("last-export-directory").toString();
+    }
+
+    QString fileName = dir + "/" + col_.getDeckName(currentDeckId_) + ".apkg";
     fileName = QFileDialog::getSaveFileName(this, tr("Save File As .apkg "),
                                fileName,
                                tr("apkg files (*.apkg)"));
@@ -306,6 +337,14 @@ void MainWindow::on_actionExport_as_apkg_triggered()
     }
 
     apkg.exportAsApkg(filePath, baseName);
+
+    if (dir != filePath) {
+        QFileInfo info(filePath);
+        // TODO: fix 'ankipackage' and remove checks
+        if (info.exists() && info.isDir() && info.isWritable()) {
+            prefs_.setProperty("last-export-directory", info.absoluteFilePath());
+        }
+    }
 #endif
 }
 
