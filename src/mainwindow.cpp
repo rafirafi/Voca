@@ -66,6 +66,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->actionShow_Deck_Name->setChecked(prefs_.getProperty("show-current-deck-name").toBool());
     ui->actionShow_Current_Word->setChecked(prefs_.getProperty("show-last-word-found").toBool());
+
+    auto winGeo = prefs_.getProperty("last-window-geometry").toByteArray();
+    if (!winGeo.isEmpty() && !this->restoreGeometry(winGeo)) {
+        prefs_.resetProperty("last-window-geometry");
+    }
 }
 
 MainWindow::~MainWindow()
@@ -533,4 +538,10 @@ void MainWindow::on_actionShow_Deck_Name_toggled(bool isChecked)
 void MainWindow::on_actionShow_Current_Word_toggled(bool isChecked)
 {
     prefs_.setProperty("show-last-word-found", isChecked);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    prefs_.setProperty("last-window-geometry", this->saveGeometry());
+    return QMainWindow::closeEvent(event);
 }

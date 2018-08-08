@@ -56,6 +56,8 @@ private:
     void clearCurrentWord();
 
     Preferences prefs_;
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // MAINWINDOW_H

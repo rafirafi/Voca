@@ -30,6 +30,7 @@ void Preferences::init()
     defaultData_.insert("show-last-word-found", {QVariant::Bool, true});
     defaultData_.insert("last-import-directory", {QVariant::String, QDir::homePath()});
     defaultData_.insert("last-export-directory", {QVariant::String, QDir::homePath()});
+    defaultData_.insert("last-window-geometry", {QVariant::ByteArray, ""});
 
     // set data to default
     data_ = defaultData_;
