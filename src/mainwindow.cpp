@@ -360,6 +360,8 @@ void MainWindow::on_actionAbout_triggered()
 
     auto butBox = new QDialogButtonBox(QDialogButtonBox::Close, &dia);
     butBox->button(QDialogButtonBox::Close)->setIcon(QIcon::fromTheme("cancel"));
+    // NOTE : translation should be provided by Qt
+    butBox->button(QDialogButtonBox::Close)->setText(tr("Close"));
     connect(butBox, &QDialogButtonBox::clicked, &dia, &QDialog::close);
 
     auto text = new QLabel(&dia);
@@ -507,6 +509,9 @@ void MainWindow::on_actionChoose_current_deck_triggered()
     dia.layout()->addWidget(view);
     auto butBox = new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Ok, &dia);
     butBox->button(QDialogButtonBox::Close)->setIcon(QIcon::fromTheme("cancel"));
+    // NOTE : translation should be provided by Qt
+    butBox->button(QDialogButtonBox::Ok)->setText(tr("Ok"));
+    butBox->button(QDialogButtonBox::Close)->setText(tr("Close"));
     connect(butBox, &QDialogButtonBox::rejected , &dia, &QDialog::close);
     connect(butBox, &QDialogButtonBox::accepted , &dia, &QDialog::accept);
     dia.layout()->addWidget(butBox);
