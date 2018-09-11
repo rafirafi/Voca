@@ -148,7 +148,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="236"/>
-        <location filename="../mainwindow.cpp" line="697"/>
+        <location filename="../mainwindow.cpp" line="495"/>
         <source>Choose current deck</source>
         <translation>Choisir le paquet en cours</translation>
     </message>
@@ -158,95 +158,93 @@
         <translation>Monter le mot en cours</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="30"/>
+        <location filename="../mainwindow.cpp" line="29"/>
         <source>Default</source>
         <translation>Défaut</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="185"/>
-        <location filename="../mainwindow.cpp" line="646"/>
-        <location filename="../mainwindow.cpp" line="648"/>
+        <location filename="../mainwindow.cpp" line="101"/>
+        <location filename="../mainwindow.cpp" line="417"/>
+        <location filename="../mainwindow.cpp" line="419"/>
         <source>Deck : %1</source>
         <translation>Paquet : %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="235"/>
-        <location filename="../mainwindow.cpp" line="269"/>
-        <location filename="../mainwindow.cpp" line="274"/>
-        <location filename="../mainwindow.cpp" line="501"/>
-        <location filename="../mainwindow.cpp" line="689"/>
-        <location filename="../mainwindow.cpp" line="732"/>
+        <location filename="../mainwindow.cpp" line="127"/>
+        <location filename="../mainwindow.cpp" line="142"/>
+        <location filename="../mainwindow.cpp" line="148"/>
+        <location filename="../mainwindow.cpp" line="448"/>
         <source>Word : %1</source>
         <translation>Mot : %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="284"/>
+        <location filename="../mainwindow.cpp" line="165"/>
         <source>Save File</source>
         <translation>Sauvegarder le fichier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="286"/>
-        <location filename="../mainwindow.cpp" line="359"/>
+        <location filename="../mainwindow.cpp" line="167"/>
+        <location filename="../mainwindow.cpp" line="237"/>
         <source>csv files (*.csv)</source>
         <translation>fichiers csv (*.csv)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="294"/>
+        <location filename="../mainwindow.cpp" line="175"/>
         <source>Export to csv failed : permission denied</source>
         <translation>L&apos;export vers csv à échoué : permission refusée</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="328"/>
+        <location filename="../mainwindow.cpp" line="201"/>
         <source>Export to csv failed : write error</source>
         <translation>L&apos;export vers csv à échoué : ereur d&apos;écriture</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="357"/>
+        <location filename="../mainwindow.cpp" line="235"/>
         <source>Open File</source>
         <translation>Ouvrir un fichier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="367"/>
+        <location filename="../mainwindow.cpp" line="245"/>
         <source>Import from csv failed : permission denied</source>
         <translation>L&apos;import du fichier csv a échoué : permission refusée</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="413"/>
+        <location filename="../mainwindow.cpp" line="280"/>
         <source>Import from csv : imported %1/%2 data</source>
         <translation>Import de csv ; importé %1/%2 données</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="512"/>
+        <location filename="../mainwindow.cpp" line="309"/>
         <source>Save File As .apkg </source>
         <translation>Sauvegarder en .apkg</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="514"/>
+        <location filename="../mainwindow.cpp" line="311"/>
         <source>apkg files (*.apkg)</source>
         <translation>fichiers.apkg (*.apkg)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="532"/>
+        <location filename="../mainwindow.cpp" line="327"/>
         <source>Changing deck name, current : %1 ?</source>
         <translation>Changer le nom du paquet, nom actuel : %1 ?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="535"/>
+        <location filename="../mainwindow.cpp" line="330"/>
         <source>Deck name</source>
         <translation>Nom du paquet</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="535"/>
+        <location filename="../mainwindow.cpp" line="330"/>
         <source>Deck Name :</source>
         <translation>Nom du paquet :</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="569"/>
+        <location filename="../mainwindow.cpp" line="359"/>
         <source>About </source>
         <translation>À propos </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="577"/>
+        <location filename="../mainwindow.cpp" line="367"/>
         <source>Copyright © 2018 rafirafi
 
 License AGPL v3
@@ -254,34 +252,44 @@ License AGPL v3
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="605"/>
+        <location filename="../mainwindow.cpp" line="395"/>
         <source>Deck %1 already exists, ok for deleting it ?</source>
         <translation>Le paquet %1 existe déjà, d&apos;accord pour le supprimer ?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="657"/>
+        <location filename="../mainwindow.cpp" line="456"/>
         <source>Rename Deck</source>
         <translation>Renommer le paquet</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="658"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Deck name : %1</source>
         <translation>Nom du paquet : %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="669"/>
+        <location filename="../mainwindow.cpp" line="468"/>
         <source>Create Deck</source>
         <translation>Créer un paquet</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="670"/>
+        <location filename="../mainwindow.cpp" line="469"/>
         <source>Deck name :</source>
         <translation>Nom du paquet :</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="680"/>
+        <location filename="../mainwindow.cpp" line="479"/>
         <source>Deck %1 already exists, ok for overwriting it ?</source>
         <translation>Le paquet %1 existe déjà, d&apos;accord pour le supprimer et le remplacer ?</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="511"/>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="512"/>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
     </message>
 </context>
 </TS>
